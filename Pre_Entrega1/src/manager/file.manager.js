@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 export default class FileManager {
-  constructor(filePath) {
+  constructor(filePath = './carts.json') {
     this.path = filePath;
   }
 
@@ -34,7 +34,7 @@ export default class FileManager {
 
   update = async (data) => {
     try {
-        const list = this.read()
+        const list = await this.read()
         const idx = list.findIndex (d => d.id === data.id)
         list[idx] = data
         return fs.promises.writeFile(this.path, JSON.stringify(data));

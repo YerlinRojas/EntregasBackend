@@ -1,41 +1,56 @@
-import FileManager from './file.manager'
-
+import FileManager from './file.manager.js';
 
 export default class CartManager extends FileManager {
   constructor() {
-    super('./carts.json')
+    super('./carts.json');
   }
 
-  create = async () => {
-    const carts = {
-      id: await this.getId(),
+  createCart = async () => {
+    const cartId = await this.getNewCartId();
+    const cart = {
+      id: cartId,
       products: []
-    }
-    return await this.write(carts)
-  }
-  
-  getId = async () => {
-    const listProduct = await this.create()
-    const lastProduct = listProduct.length > 0 ? listProduct[listProduct.length - 1].id : 0
-    return lastProduct + 1
-  }
-  
-  add = async (cid, pid, quantity) => {
-    const carts = await this.read();
-    const cart = carts.find(cart => cart.id === cid);
+    };
+    await this.write([...await this.read(), cart]);
+    return cart;
+  };
+
+  listCart = async (cartId) => {
+    const cart = await this.getCartById(cartId);
     if (cart) {
-      const product = cart.products.find(product => product.id === pid);
-      if (product) {
-        product.quantity += quantity; 
+      return cart.products;
+    }
+    return null;
+  }
+
+  getCartById = async (cartId) => {
+    const carts = await this.read();
+    return carts.find(cart => cart.id === cartId);
+  };
+
+  addProductToCart = async (cartId, productId, quantity) => {
+    const carts = await this.read();
+    const cart = carts.find(cart => cart.id === cartId);
+    if (cart) {
+      const existingProduct = cart.products.find(product => product.id === productId);
+      if (existingProduct) {
+        existingProduct.quantity += quantity;
       } else {
         cart.products.push({
-          id: pid,
+          id: productId,
           quantity: quantity
         });
       }
       await this.write(carts);
-    } 
+      return cart;
+    }
+    return null;
   }
 
-
+  getNewCartId = async () => {
+    const carts = await this.read();
+    const lastCart = carts.length > 0 ? carts[carts.length - 1] : null;
+    const lastCartId = lastCart ? lastCart.id : 0;
+    return lastCartId + 1;
+  }
 }
