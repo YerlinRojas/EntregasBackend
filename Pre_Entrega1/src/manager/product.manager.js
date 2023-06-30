@@ -1,7 +1,7 @@
-const fs = require('fs')
+import fs from 'fs'
 
-class ProductManager {
-  constructor(path) {
+export default class ProductManager {
+  constructor(path = './db.json') {
     this.path = path;
     this.format = 'utf-8'
   }
@@ -9,18 +9,20 @@ class ProductManager {
   
   getProduct = () => {
     if (fs.existsSync(this.path)) {
-      return fs.promises.readFile(this.path, this.format).then(r => JSON.parse(r))
+      return fs.promises.readFile(this.path, this.format)
+      .then(r => JSON.parse(r))
     } else {
       return []
     }
   };
 
-  addProduct = async (title, description, price, thumbnail, code, stock) => {
+  addProduct = async ({title, description, price, categeory, thumbnail, code, stock}) => {
     const product = {
       id: await this.getId(),
       title,
       description,
       price,
+      categeory,
       thumbnail,
       code,
       stock,
@@ -63,7 +65,7 @@ class ProductManager {
     const listProduct = await this.getProduct()
     const productIndex = listProduct.findIndex(product => product.id === id)
 
-    if (productIndex >0) {
+    if (productIndex >= 0) {
       listProduct[productIndex] = {
         ...listProduct[productIndex],
         ...updatedData,
@@ -74,9 +76,10 @@ class ProductManager {
       console.log('Producto actualizado correctamente.')
       return listProduct[productIndex]
     } else {
-      console.log('Producto no encontrado.')
+      console.log('Producto no encontrado.') 
       return null
     }
+   
   }
 
   deleteProduct = async(id) => {
