@@ -15,10 +15,10 @@ export default class CartManager extends FileManager {
     return cart;
   };
 
-  listCart = async (cartId) => {
-    const cart = await this.getCartById(cartId);
+  listCart = async () => {
+    const cart = await this.read();
     if (cart) {
-      return cart.products;
+      return cart
     }
     return null;
   }
@@ -29,22 +29,22 @@ export default class CartManager extends FileManager {
   };
 
   addProductToCart = async (cartId, productId, quantity) => {
-    const carts = await this.read();
+    const carts = await this.listCart();
     const cart = carts.find(cart => cart.id === cartId);
     if (cart) {
       const existingProduct = cart.products.find(product => product.id === productId);
       if (existingProduct) {
-        existingProduct.quantity += quantity;
+        existingProduct.quantity += quantity
       } else {
         cart.products.push({
           id: productId,
           quantity: quantity
         });
       }
-      await this.write(carts);
-      return cart;
+      await this.write(carts)
+      return cart
     }
-    return null;
+    return null
   }
 
   getNewCartId = async () => {
