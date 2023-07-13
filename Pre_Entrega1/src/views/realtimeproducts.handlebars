@@ -1,0 +1,82 @@
+<h1>Lista de productos en tiempo real</h1>
+
+<form id="addProductForm">
+Title:<input type="text" id="title" placeholder="title" required>
+Description:<input type="text" id="description" placeholder="Description" required>
+Price:<input type="number" id="price" placeholder="Price" required>
+Category:<input type="text" id="categeory" placeholder="category" required>
+Thumbnail:<input type="text" id="thumbnail" placeholder="thumbnail" required>
+Code:<input type="number" id="code" placeholder="code" required>
+Stock:<input type="number" id="stock" placeholder="Stock" required>
+  <input type="submit" value="Agregar producto">
+</form>
+
+<table class="default" border="1px">
+  <th>ID:</th>
+   <th>Title:</th>
+   <th>Description:</th>
+   <th>Price:</th>
+   <th>Category:</th>
+   <th>Thumbnail:</th>
+   <th>Code:</th>
+   <th>Stock:</th>
+    {{#each products}}
+    <tr>
+    <td>{{this.id}}</td>
+    <td>{{this.title}}</td>
+    <td>{{this.description}}</td>
+    <td>{{this.price}}</td>
+    <td>{{this.categeory}}</td>
+    <td>{{this.thumbnail}}</td>
+    <td>{{this.code}}</td>
+    <td>{{this.stock}}</td>
+</tr>
+  {{/each}}
+
+</table>
+
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  const socket = io();
+
+// Evento para enviar el formulario y agregar un nuevo producto
+document.getElementById('addProductForm').addEventListener('submit', (event) => {
+event.preventDefault() // Evitar el envío del formulario por defecto
+
+    const title = document.getElementById('title').value.trim()
+    const description = document.getElementById('description').value.trim()
+    const price = document.getElementById('price').value.trim()
+    const categeory = document.getElementById('categeory').value.trim()
+    const thumbnail = document.getElementById('thumbnail').value.trim()
+    const code = document.getElementById('code').value.trim()
+    const stock = document.getElementById('stock').value.trim()
+
+
+ if (title !== ''){ 
+  
+  console.log(title,description,price,categeory,thumbnail,code,stock)
+
+      socket.emit('addProduct', title,description,price,categeory,thumbnail,code,stock)
+
+
+      // Limpiar los campos del formulario
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
+      document.getElementById('price').value = '';
+      document.getElementById('categeory').value = '';
+      document.getElementById('thumbnail').value = '';
+      document.getElementById('code').value = '';
+      document.getElementById('stock').value = '';
+    }
+  })
+
+ // Evento para recibir la lista de productos actualizada
+  socket.on('productAdded', (result)=>{
+    console.log(result)
+})
+
+
+
+
+</script>
